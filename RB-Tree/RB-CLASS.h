@@ -20,7 +20,9 @@ public:
 		parent = NULL;
 	}
 	template <typename T>
-	friend RBNode<T>* add(RBNode<T>*, T new_elem);
+	friend RBNode<T>* add(RBNode<T>*, T);
+	template <typename T>
+	friend RBNode<T>* right_rotate(RBNode<T>*);
 };
 
 template <typename Type>
