@@ -23,7 +23,11 @@ public:
 	template <typename T>
 	friend RBNode<T>* add(RBNode<T>*, T);
 	template <typename T>
+	friend RBNode<T>* del(RBNode<T>*, const T&);
+	template <typename T>
 	friend RBNode<T>* right_rotate(RBNode<T>*);
+	template <typename T>
+	friend RBNode<T>* left_rotate(RBNode<T>*);
 };
 
 template <typename Type>
