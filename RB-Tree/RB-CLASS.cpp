@@ -1,13 +1,13 @@
-#include "RB-CLASS.h"
+Ôªø#include "RB-CLASS.h"
 
 template <typename T>
 RBNode<T>* add(RBNode<T>*& node, T new_elem) {
-	if (node == nullptr) { //ƒÓ·‡‚ÎÂÌËÂ Í‡ÒÌÓÈ ‚Â¯ËÌ˚ ‚ ‰ÂÂ‚Ó
+	if (node == nullptr) { //√Ñ√Æ√°√†√¢√´√•√≠√®√• √™√∞√†√±√≠√Æ√© √¢√•√∞√∏√®√≠√ª √¢ √§√•√∞√•√¢√Æ
 		node = new RBNode(new_elem);
 		bh += 1;
 		return node;
 	}
-	//¬˚·Ó ÔÓ‰‰ÂÂ‚‡, ‚ ÍÓÚÓÓÂ ÌÛÊÌÓ Á‡ÔËıÌÛÚ¸ ˝ÎÂÏÂÌÚ
+	//√Ç√ª√°√Æ√∞ √Ø√Æ√§√§√•√∞√•√¢√†, √¢ √™√Æ√≤√Æ√∞√Æ√• √≠√≥√¶√≠√Æ √ß√†√Ø√®√µ√≠√≥√≤√º √Ω√´√•√¨√•√≠√≤
 	if (node->data < new_elem) {
 		node->left = add(node->left, new_elem);
 		node->left->parent = node;
@@ -15,11 +15,11 @@ RBNode<T>* add(RBNode<T>*& node, T new_elem) {
 		node->right = add(node->right, new_elem);
 		node->right->parent = node;
 	}
-	//≈ÒÎË 2 Í‡ÒÌ˚Â ‚Â¯ËÌ˚ ˇ‰ÓÏ, ÚÓ ÌÛÊÌÓ ·‡Î‡ÌÒËÓ‚‡Ú¸
+	//√Ö√±√´√® 2 √™√∞√†√±√≠√ª√• √¢√•√∞√∏√®√≠√ª √∞√ø√§√Æ√¨, √≤√Æ √≠√≥√¶√≠√Æ √°√†√´√†√≠√±√®√∞√Æ√¢√†√≤√º
 	if (node->is_red && node->left->is_red) {
 		RBNode<T>* uncle;
 		bool an_side;
-		//¬˚ˇÒÌˇÂÏ ÍÚÓ ‰ˇ‰ˇ
+		//√Ç√ª√ø√±√≠√ø√•√¨ √™√≤√Æ √§√ø√§√ø
 		if (node->parent->left == node) {
 			uncle = node->parent->right;
 			an_side = false;
@@ -27,11 +27,11 @@ RBNode<T>* add(RBNode<T>*& node, T new_elem) {
 			uncle = node->parent->left;
 			an_side = true;
 		}
-		if (uncle != nullptr && uncle->is_red) { //≈ÒÎË ‰ˇ‰ˇ Í‡ÒÌ˚È, ÔÂÂÍ‡¯Ë‚‡ÂÏ
+		if (uncle != nullptr && uncle->is_red) { //√Ö√±√´√® √§√ø√§√ø √™√∞√†√±√≠√ª√©, √Ø√•√∞√•√™√∞√†√∏√®√¢√†√•√¨
 			node->parent->is_red = true;
 			node->is_red = false;
 			uncle->is_red = false;
-		} else { //»Ì‡˜Â ÍÛÚËÏ-‚ÂÚËÏ Ë Í‡ÒËÏ
+		} else { //√à√≠√†√∑√• √™√∞√≥√≤√®√¨-√¢√•√∞√≤√®√¨ √® √™√∞√†√±√®√¨
 			node->is_red = false;
 			node->parent->is_red = true;
 			if (an_side) {
@@ -39,7 +39,7 @@ RBNode<T>* add(RBNode<T>*& node, T new_elem) {
 			}
 			node = right_rotate(node->parent);
 		}
-	} else if (node->is_red && node->right->is_red) { //¿Ì‡ÎÓ„Ë˜ÌÓ ÔÂ‰˚‰Û˘ÂÏÛ if-Û 
+	} else if (node->is_red && node->right->is_red) { //√Ä√≠√†√´√Æ√£√®√∑√≠√Æ √Ø√∞√•√§√ª√§√≥√π√•√¨√≥ if-√≥ 
 		RBNode<T>* uncle;
 		bool on_side;
 		if (node->parent->left == node) {
@@ -87,4 +87,30 @@ RBNode<T>* right_rotate(RBNode<T> * node) {
 		node->left->parent = node;
 	}
 	return new_node->left;
+}
+
+template <typename T>
+RBNode<T>* left_rotate(RBNode<T>* node) {
+	if (node != NULL) {
+		RBNode<T>* new_node = node->right;
+		//–Ω–∞—Å—Ç—Ä–æ–∏–º —Ä–æ–¥–∏—Ç–µ–ª—è
+		RBNode<T>* parent = node->parent;
+		new_node->parent = parent;
+		node->parent = new_node;
+		if (parent) {
+			if (parent->left == node) {
+				parent->left = new_node;
+			}
+			else {
+				parent->right = new_node;
+			}
+		}
+		//–ø–µ—Ä–µ–¥–∞—á–∞ –¥–µ—Ç–µ–π
+		RBNode<T>* left_baby = node->left;
+		new_node->right = left_baby;
+		node->left = new_node;
+		if (left_baby) left_baby->parent = new_node;
+		return new_node;
+	}
+	return node;
 }
