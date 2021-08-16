@@ -4,6 +4,8 @@
 template <typename Type>
 class RBTree;
 
+#pragma once
+
 template <typename Type>
 struct RBNode {
 	bool is_red;
