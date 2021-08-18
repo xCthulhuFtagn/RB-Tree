@@ -1,17 +1,21 @@
-#include <iostream>
-
-template <typename Type>
-class RBTree;
+﻿#include <queue>
+#include <algorithm>
+#include <utility>
 
 #pragma once
 
-template <typename Type>
+template <class Type>
+struct RBNode;
+
+template <class Type>
+class RBTree;
+
+template <class Type>
 struct RBNode {
 	bool is_red;
 	unsigned bh; //black height
 	Type data;
 	RBNode* left, * right, * parent;
-public:
 	RBNode(Type new_data) {
 		data = new_data;
 		bh = 0;
@@ -20,26 +24,15 @@ public:
 		right = NULL;
 		parent = NULL;
 	}
-	template <typename T>
-	friend RBNode<T>* add(RBNode<T>*, T);
-	template <typename T>
-	friend RBNode<T>* del(RBNode<T>*, const T&);
-	template <typename T>
-	friend RBNode<T>* right_rotate(RBNode<T>*);
-	template <typename T>
-	friend RBNode<T>* left_rotate(RBNode<T>*);
 };
 
-template <typename Type>
+template <class Type>
 class RBTree {
-	RBNode <Type> root;
+	RBNode <Type>* root;
 public:
 	RBTree() {
 		root = nullptr;
 	}
-	&RBtree add(Type new_elem) {
-		root = add(root, new_elem);
-		root->is_red = false;
-		return *this;
-	}
+	RBTree& insert(const Type&);
+	RBTree& remove(const Type&);
 };
