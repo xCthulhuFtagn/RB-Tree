@@ -146,6 +146,7 @@ RBNode<T>* del(RBNode<T>* input, const T& what) {
 			//red with 1 baby is impossible
 			node->data = node->right->data;
 			del(node->right);
+			return input;
 		}
 		else { // !l && !r
 			if (node->is_red) {
