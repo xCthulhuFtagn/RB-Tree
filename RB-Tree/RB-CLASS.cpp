@@ -4,7 +4,10 @@ using namespace std;
 
 template class RBTree<int>;
 template struct RBNode<int>;
-
+template class RBTree<double>;
+template struct RBNode<double>;
+template class RBTree<char>;
+template struct RBNode<char>;
 
 template<class Type>
 void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one) {
@@ -50,19 +53,26 @@ RBNode<Type>* WidthSearch(RBNode<Type>* node, func f) {
 */
 
 template <class Type>
-RBNode<Type>* add(RBNode<Type>*& node, const Type& new_elem) {
+RBNode<Type>* add(RBNode<Type>* node, const Type& new_elem) {
 	if (node == nullptr) { //Äîáàâëåíèå êðàñíîé âåðøèíû â äåðåâî
 		node = new RBNode<Type>(new_elem);
-		//bh += 1;
 		return node;
 	}
 	//Âûáîð ïîääåðåâà, â êîòîðîå íóæíî çàïèõíóòü ýëåìåíò
 	if (node->data > new_elem) {
-		node->left = add(node->left, new_elem);
-		node->left->parent = node;
+		RBNode<Type>* n = add(node->left, new_elem);
+		if (node->bh == 0 || n->parent == node) {
+			node->left = n;
+			n->parent = node;
+		}
+		else node = n;
 	} else if (node->data < new_elem) {
-		node->right = add(node->right, new_elem);
-		node->right->parent = node;
+		RBNode<Type>* n = add(node->right, new_elem);
+		if (node->bh == 0 || n->parent == node) {
+			node->right = n;
+			n->parent = node;
+		}
+		else node = n;
 	}
 	//Åñëè 2 êðàñíûå âåðøèíû ðÿäîì, òî íóæíî áàëàíñèðîâàòü
 	if (node->left != nullptr && node->is_red && node->left->is_red) {
@@ -79,10 +89,14 @@ RBNode<Type>* add(RBNode<Type>*& node, const Type& new_elem) {
 		if (uncle != nullptr && uncle->is_red) { //Åñëè äÿäÿ êðàñíûé, ïåðåêðàøèâàåì
 			node->parent->is_red = true;
 			node->is_red = false;
+			node->bh += 1;
 			uncle->is_red = false;
+			uncle->bh += 1;
 		} else { //Èíà÷å êðóòèì-âåðòèì è êðàñèì
 			node->is_red = false;
+			node->bh += 1;
 			node->parent->is_red = true;
+			node->parent->bh -= 1;
 			if (an_side) {
 				node = left_rotate(node);
 			}
@@ -102,11 +116,15 @@ RBNode<Type>* add(RBNode<Type>*& node, const Type& new_elem) {
 		if (uncle != nullptr && uncle->is_red) {
 			node->parent->is_red = true;
 			node->is_red = false;
+			node->bh += 1;
 			uncle->is_red = false;
+			uncle->bh += 1;
 		}
 		else {
 			node->is_red = false;
+			node->bh += 1;
 			node->parent->is_red = true;
+			node->parent->bh -= 1;
 			if (an_side) {
 				node = right_rotate(node);
 			}
@@ -216,20 +234,28 @@ RBNode<Type>* right_rotate(RBNode<Type> * node) {
 	node->left = new_node->right;
 	new_node->parent = node->parent;
 	node->parent = new_node;
-	new_node = new_node->right;
-	new_node->right = node;
-	if (new_node->parent != nullptr) {
-		if (new_node->parent->left == node)
-			new_node->parent->left = new_node;
-		else
-			new_node->parent->right = new_node;
-	}
 	if (node->left != nullptr) {
 		node->left->parent = node;
 	}
-	return new_node->left;
+	return new_node;
 }
 
+/*
+template <class Type>
+RBNode<Type>* left_rotate(RBNode<Type>* node) {
+	RBNode<Type>* new_node = node->right;
+	node->right = new_node->left;
+	new_node->parent = node->parent;
+	node->parent = new_node;
+	new_node->left = node;
+	if (node->right != nullptr) {
+		node->right->parent = node;
+	}
+	return new_node;
+}
+*/
+
+/*
 template <class Type>
 RBNode<Type>* left_rotate(RBNode<Type>* node) {
 	if (node != NULL) {
@@ -246,6 +272,7 @@ RBNode<Type>* left_rotate(RBNode<Type>* node) {
 	}
 	return node;
 }
+*/
 
 template <class Type>
 RBTree<Type>& RBTree<Type>::insert(const Type& new_elem) {
