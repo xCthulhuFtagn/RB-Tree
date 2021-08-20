@@ -1,4 +1,5 @@
 ﻿#include "RB-CLASS.h"
+#include <queue>
 
 using namespace std;
 
@@ -24,12 +25,13 @@ void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one) {
 		}
 	}
 }
-/*
+
 template<class Type>
-void swap_nodes(RBNode<Type>* left_swp, RBNode<Type>* right_swp) {
+RBNode<Type>* swap_nodes(RBNode<Type>* left_swp, RBNode<Type>* right_swp) {
 	swap(left_swp->left, right_swp->left);
 	swap(left_swp->right, right_swp->right);
 	swap(left_swp->parent, right_swp->parent);
+	return left_swp;
 }
 
 template<class Type>
@@ -37,7 +39,8 @@ bool has_1_kid(RBNode<Type>* node) {
 	return !(node->left) || !(node->right);
 }
 
-template <class func, class Type>
+/*
+template <typename func, class Type>
 RBNode<Type>* WidthSearch(RBNode<Type>* node, func f) {
 	//walking by width, stops if found element with less than two children
 	queue<RBNode<Type>*> pop;
@@ -47,10 +50,37 @@ RBNode<Type>* WidthSearch(RBNode<Type>* node, func f) {
 		pop.push(keeper->left);
 		pop.push(keeper->right);
 		keeper = pop.pop();
-	} while (f(keeper));
+	} while (!f(keeper));
 	return keeper;
 }
 */
+
+template <typename func, typename Type>
+RBNode<Type>* DepthSearch(RBNode<Type>* node, func f) {
+	RBNode<Type>* keeper = node, check;
+	do{
+		if (f(keeper)) return keeper;
+		while (keeper->left) {
+			keeper = keeper.left;
+			if (f(keeper)) return keeper;
+		}
+		if (keeper->right) keeper = keeper->right;
+		else if (keeper->parent->parent) {
+			check = keeper->parent;
+			keeper = keeper->parent->parent->right;
+		}
+		else break;
+	} while (check != keeper);
+	return NULL;
+}
+
+
+template <typename T>
+RBNode<T>* next_key_value(RBNode<T>* node) {
+	RBNode<T>* search;
+	for (search = node->right; search->left; search = search->left);
+	return search;
+}
 
 template <class Type>
 RBNode<Type>* add(RBNode<Type>* node, const Type& new_elem) {
@@ -133,100 +163,139 @@ RBNode<Type>* add(RBNode<Type>* node, const Type& new_elem) {
 	}
 	return node;
 }
-/*
-template <class Type>
-RBNode<Type>* del(RBNode<Type>* input, const Type& what) {
-	RBNode<Type>* node = WidthSearch(input, [&what](RBNode<Type>* check) {
-		return check->data == what;
-	});
-	if (node && node->parent) {
+
+template <typename T>
+RBNode<T>* fix_del(RBNode<T>* node) {
+	while (node->parent) {
 		auto left = node->left, right = node->right;
 		if (left) {
 			if (right) {// l && r
 				if (node->is_red) {
-					RBNode<Type>* keeper = WidthSearch(node, has_1_kid);
-					swap_nodes(keeper, node);
-					del(node);
+					RBNode<T>* keeper = WidthSearch(node, has_1_kid);
+					node = swap_nodes(node, keeper);
 				}
 				else {
-					RBNode<Type>* keeper = WidthSearch(node, has_1_kid);
-					swap_nodes(keeper, node);
-					del(node);
+					RBNode<T>* keeper = WidthSearch(node, has_1_kid);
+					node = swap_nodes(node, keeper);
 				}
 			}
 			else {// l && !r
 				//red with 1 baby is impossible
 				node->data = node->left->data;
-				del(node->left);
 			}
 		}
 		else if (right) { // !l && r
 			//red with 1 baby is impossible
 			node->data = node->right->data;
-			del(node->right);
 		}
 		else { // !l && !r
-			if (node->is_red) {
+			if (node->is_red) { // Ч0
 				ChangeChild(node, NULL);
 			}
 			else {
-				RBNode<Type>* parent = node->parent;
+				RBNode<T>* parent = node->parent;
 				bool is_right = parent->right == node;
-				//RBNode<Type>* brother = (is_right) ? parent->left : parent->right;
-				//ffs, too many spins and variants
 				if (parent->is_red) {
 					if (parent->right == node) { // brother is to the left
-						RBNode<Type>* brother = parent->left;
+						RBNode<T>* brother = parent->left;
 						if (!(brother->is_red)) { //КЧ1
 							if (!(brother->left->is_red)) {
 								parent->is_red = true;
 								brother->is_red = false;
 							}
 							else { //КЧ2
-								RBNode<Type>* new_parent = right_rotate(parent);
+								RBNode<T>* new_parent = right_rotate(parent);
 								new_parent->is_red = true;
 								new_parent->right->is_red = false;
 								new_parent->left->is_red = false;
 							}
 						}
-						else { //check from here, needs to go somewhere else
-							RBNode<Type>* right_nephew = brother->right;
-							if (right_nephew->is_red) {
-
+					}
+					else { // brother is to the right
+						RBNode<T>* brother = parent->right;
+						if (!(brother->is_red)) { //КЧ1
+							if (!(brother->left->is_red)) {
+								parent->is_red = true;
+								brother->is_red = false;
+							}
+							else { //КЧ2
+								RBNode<T>* new_parent = left_rotate(parent);
+								new_parent->is_red = true;
+								new_parent->right->is_red = false;
+								new_parent->left->is_red = false;
+							}
+						}
+					}
+				}
+				else { // parent is black
+					if (parent->right == node) { // brother is to the left
+						RBNode<T>* brother = parent->left;
+						if (brother->is_red) {
+							RBNode<T>* right_nephew = brother->right;
+							if (!(right_nephew->left->is_red) && !(right_nephew->right->is_red)) { //ЧК3
+								RBNode<T>* new_parent = right_rotate(parent);
+							}
+							else { //ЧК4
+								// big_right_rotate here
+								RBNode<T>* new_brother = left_rotate(brother);
+								RBNode<T>* new_parent = right_rotate(parent);
+								// end of it
+								new_parent->left->right->is_red = false;
+							}
+						}
+						else {
+							if (RBNode<T>* right_nephew = brother->right->is_red) { //ЧЧ5
+								right_nephew->is_red = false;
+								// big_right_rotate here
+								RBNode<T>* new_brother = left_rotate(brother);
+								RBNode<T>* new_parent = right_rotate(parent);
+								// end of it
 							}
 							else {
-								if (right_nephew->left->is_red) {
-									//big_right_spin() here 
-								}
-								else {
-									RBNode<Type>* new_parent = right_rotate(parent);
-									new_parent->is_red = false;
-									new_parent->right->left->is_red = true;
-								}
+
 							}
 						}
 					}
 					else { // brother is to the right
-						RBNode<Type>* brother = parent->right;
-					}
-					parent->right = NULL;
-				}
-				else {
-					if (1) {//brother->is_red
-
-					}
-					else {
-
+						RBNode<T>* brother = parent->right;
 					}
 				}
 			}
 		}
-		delete node;
-		return input;
+		node = node->parent;
 	}
-
+	return node;
 }
-*/
+
+template <class T>
+RBNode<T>* del(RBNode<T>* root, const T& what) {
+	RBNode<T>* node = DepthSearch(root, [&what](RBNode<T>* check) {
+		return check->data == what;
+	});
+	if (node == root) return NULL;
+	RBNode<T>* left_child = node->left, *right_child = node->right, *parent = node->parent;
+	if (left_child && right_child) {
+		RBNode<T>* alternative = next_key_value(node);
+		node->data = alternative->data;
+		return del(root, alternative->data);
+	}
+	else if (left_child xor right_child) {
+		bool is_left = parent->left.data == node->data;
+		//here we put only existing child of node instead of it into left/right of parent
+		(left_child)? ( (is_left) ? parent->left = left_child : parent->right = left_child ) : ( (is_left) ? parent->left = right_child : parent->right = right_child );
+		delete node;
+	}
+	else {
+		bool is_left = parent->left.data == node->data;
+		(is_left) ? parent->left = NULL : parent->right = NULL;
+		delete node;
+	}
+	//fixing the tree after deleting
+	if (!(node->is_red)) root = fix_del(node);
+	//if fixing is not needed we return root of the tree
+	else for(; node->parent; node = node->parent);
+	return node;
+}
 
 template <class Type>
 RBNode<Type>* right_rotate(RBNode<Type> * node) {
@@ -281,10 +350,8 @@ RBTree<Type>& RBTree<Type>::insert(const Type& new_elem) {
 	return *this;
 }
 
-/*
 template <class Type>
 RBTree<Type>& RBTree<Type>::remove(const Type& elem) {
 	root = del(root, elem);
 	return *this;
 }
-*/

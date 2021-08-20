@@ -1,5 +1,4 @@
-﻿#include <queue>
-#include <algorithm>
+﻿#include <algorithm>
 #include <utility>
 
 #pragma once
