@@ -12,13 +12,13 @@ class RBTree;
 template <class Type>
 struct RBNode {
 	bool is_red;
-	unsigned bh; //black height
+	//unsigned bh; //black height (unnesASSary parameter)
 	Type data;
 	RBNode* left, * right, * parent;
 	RBNode(){}
 	RBNode(Type new_data) {
 		data = new_data;
-		bh = 0;
+		//bh = 0;
 		is_red = true;
 		left = NULL;
 		right = NULL;

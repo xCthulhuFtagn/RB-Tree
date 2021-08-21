@@ -98,85 +98,75 @@ RBNode<T>* next_key_value(RBNode<T>* node) {
 
 template <class Type>
 RBNode<Type>* add(RBNode<Type>* node, const Type& new_elem) {
-	if (node == nullptr) { //Äîáàâëåíèå êðàñíîé âåðøèíû â äåðåâî
+	if (node == nullptr) { //Добавление вершины
 		node = new RBNode<Type>(new_elem);
 		return node;
 	}
-	//Âûáîð ïîääåðåâà, â êîòîðîå íóæíî çàïèõíóòü ýëåìåíò
 	if (node->data > new_elem) {
 		RBNode<Type>* n = add(node->left, new_elem);
-		if (node->bh == 0 || n->parent == node) {
+		if (n->left == nullptr) {
+			n->parent = node;
 			node->left = n;
-			n->parent = node;
+		} else if (n == node->parent) {
+			node = n;
 		}
-		else node = n;
-	}
-	else if (node->data < new_elem) {
+	} else if (node->data < new_elem) {
 		RBNode<Type>* n = add(node->right, new_elem);
-		if (node->bh == 0 || n->parent == node) {
-			node->right = n;
+		if (n->right == nullptr) {
 			n->parent = node;
+			node->right = n;
+		} else if (n == node->parent) {
+			node = n;
 		}
-		else node = n;
 	}
-	//Åñëè 2 êðàñíûå âåðøèíû ðÿäîì, òî íóæíî áàëàíñèðîâàòü
 	if (node->left != nullptr && node->is_red && node->left->is_red) {
 		RBNode<Type>* uncle;
 		bool an_side;
-		//Âûÿñíÿåì êòî äÿäÿ
 		if (node->parent->left == node) {
 			uncle = node->parent->right;
 			an_side = false;
-		}
-		else {
+		} else {
 			uncle = node->parent->left;
 			an_side = true;
 		}
-		if (uncle != nullptr && uncle->is_red) { //Åñëè äÿäÿ êðàñíûé, ïåðåêðàøèâàåì
+		if (uncle != nullptr && uncle->is_red) {
 			node->parent->is_red = true;
 			node->is_red = false;
-			node->bh += 1;
 			uncle->is_red = false;
-			uncle->bh += 1;
-		}
-		else { //Èíà÷å êðóòèì-âåðòèì è êðàñèì
+		} else {
 			node->is_red = false;
-			node->bh += 1;
 			node->parent->is_red = true;
-			node->parent->bh -= 1;
 			if (an_side) {
-				node = left_rotate(node);
+				node = right_rotate(node);
+				node = left_rotate(node->parent);
+			} else {
+				node = right_rotate(node->parent);
 			}
-			node = right_rotate(node->parent);
 		}
 	}
-	else if (node->right != nullptr && node->is_red && node->right->is_red) { //Àíàëîãè÷íî ïðåäûäóùåìó if-ó 
+	else if (node->right != nullptr && node->is_red && node->right->is_red) {
 		RBNode<Type>* uncle;
 		bool an_side;
 		if (node->parent->left == node) {
 			uncle = node->parent->right;
 			an_side = true;
-		}
-		else {
+		} else {
 			uncle = node->parent->left;
 			an_side = false;
 		}
 		if (uncle != nullptr && uncle->is_red) {
 			node->parent->is_red = true;
 			node->is_red = false;
-			node->bh += 1;
 			uncle->is_red = false;
-			uncle->bh += 1;
-		}
-		else {
+		} else {
 			node->is_red = false;
-			node->bh += 1;
 			node->parent->is_red = true;
-			node->parent->bh -= 1;
 			if (an_side) {
-				node = right_rotate(node);
+				node = left_rotate(node);
+				node = right_rotate(node->parent);
+			} else {
+				node = left_rotate(node->parent);
 			}
-			node = left_rotate(node->parent);
 		}
 	}
 	return node;
