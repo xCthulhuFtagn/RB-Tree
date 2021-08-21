@@ -9,4 +9,7 @@ int main()
     intree.insert(13);
     intree.insert(14);
     std::cout << "Test passed!" << std::endl;
+    intree.remove(12);
+    intree.remove(1111);
+    std::cout << "Test 2 passed!" << std::endl;
 }

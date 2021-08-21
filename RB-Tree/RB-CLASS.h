@@ -1,7 +1,7 @@
-﻿#include <algorithm>
-#include <utility>
+﻿#pragma once
 
-#pragma once
+#include <algorithm>
+#include <utility>
 
 template <class Type>
 struct RBNode;
@@ -15,6 +15,7 @@ struct RBNode {
 	unsigned bh; //black height
 	Type data;
 	RBNode* left, * right, * parent;
+	RBNode(){}
 	RBNode(Type new_data) {
 		data = new_data;
 		bh = 0;
