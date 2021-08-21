@@ -8,10 +8,9 @@ template struct RBNode<int>;
 template<class Type>
 void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one);
 
-
 template<class Type>
 void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one) {
-	if (prev_child) {
+	if (1) {//prev) {
 		RBNode<Type>* parent = prev_child->parent;
 		if (new_one) new_one->parent = parent;
 		if (parent) {
@@ -289,7 +288,9 @@ RBNode<Type>* right_rotate(RBNode<Type>* node) {
 	}
 	return new_node;
 }
+*/
 
+/*
 template <class Type>
 RBNode<Type>* left_rotate(RBNode<Type>* node) {
 	RBNode<Type>* new_node = node->right;
