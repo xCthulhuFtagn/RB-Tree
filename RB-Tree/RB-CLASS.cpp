@@ -288,9 +288,7 @@ RBNode<Type>* right_rotate(RBNode<Type>* node) {
 	}
 	return new_node;
 }
-*/
 
-/*
 template <class Type>
 RBNode<Type>* left_rotate(RBNode<Type>* node) {
 	RBNode<Type>* new_node = node->right;
