@@ -10,14 +10,13 @@ void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one);
 
 template<class Type>
 void ChangeChild(RBNode<Type>* prev_child, RBNode<Type>* new_one) {
-	if (1) {//prev) {
+	if (prev_child) {
 		RBNode<Type>* parent = prev_child->parent;
 		if (new_one) new_one->parent = parent;
 		if (parent) {
 			if (parent->left == prev_child) {
 				parent->left = new_one;
-			}
-			else {
+			} else {
 				parent->right = new_one;
 			}
 		}
@@ -47,47 +46,15 @@ RBNode<Type>* swap_nodes(RBNode<Type>* left_swp, RBNode<Type>* right_swp) {
 	return left_swp;
 }
 
-/*
-template<class Type>
-bool has_1_kid(RBNode<Type>* node) {
-	return !(node->left) || !(node->right);
+template <typename Type>
+RBNode<Type>* DepthSearch(RBNode<Type>* node, const Type& elem) {
+	while (node) {
+		if (node->data < elem) node = node->right;
+		else if (node->data > elem) node = node->left;
+		else return NULL;
+	}
+	return node;
 }
-
-template <typename func, class Type>
-RBNode<Type>* WidthSearch(RBNode<Type>* node, func f) {
-	//walking by width, stops if found element with less than two children
-	queue<RBNode<Type>*> pop;
-	RBNode<Type>* keeper;
-	pop.push(node);
-	do {
-		pop.push(keeper->left);
-		pop.push(keeper->right);
-		keeper = pop.pop();
-	} while (!f(keeper));
-	return keeper;
-}
-*/
-
-template <typename func, typename Type>
-RBNode<Type>* DepthSearch(RBNode<Type>* node, func f) {
-	RBNode<Type>* keeper = node, *check;
-	do{
-		if (f(keeper)) return keeper;
-		while (keeper->left) {
-			keeper = keeper->left;
-			if (f(keeper)) return keeper;
-		}
-		if (keeper->right) keeper = keeper->right;
-		else if (keeper->parent->parent) {
-			check = keeper->parent;
-			keeper = keeper->parent->parent->right;
-			if (check == keeper) break;
-		}
-		else break;
-	} while (true);
-	return NULL;
-}
-
 
 template <typename T>
 RBNode<T>* next_key_value(RBNode<T>* node) {
@@ -237,9 +204,7 @@ RBNode<T>* fix_del(RBNode<T>* node) {
 
 template <class T>
 RBNode<T>* del(RBNode<T>* root, const T& what) {
-	RBNode<T>* node = DepthSearch(root, [&what](RBNode<T>* check) {
-		return check->data == what;
-	});
+	RBNode<T>* node = DepthSearch(root, what);
 	if (!node) return root;
 	if (node == root) return NULL;
 	RBNode<T>* left_child = node->left, *right_child = node->right, *parent = node->parent;
