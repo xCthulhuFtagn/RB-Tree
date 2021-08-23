@@ -56,6 +56,28 @@ RBNode<Type>* DepthSearch(RBNode<Type>* node, const Type& elem) {
 	return node;
 }
 
+/*
+template <typename func, typename Type>
+RBNode<Type>* HolyShift(RBNode<Type>* node, func f) {
+	RBNode<Type>* keeper = node, *check;
+	do{
+		if (f(keeper)) return keeper;
+		while (keeper->left) {
+			keeper = keeper->left;
+			if (f(keeper)) return keeper;
+		}
+		if (keeper->right) keeper = keeper->right;
+		else if (keeper->parent->parent) {
+			check = keeper->parent;
+			keeper = keeper->parent->parent->right;
+			if (check == keeper) break;
+		}
+		else break;
+	} while (true);
+	return NULL;
+}
+*/
+
 template <typename T>
 RBNode<T>* next_key_value(RBNode<T>* node) {
 	RBNode<T>* search;
@@ -268,4 +290,10 @@ template <class Type>
 RBTree<Type>& RBTree<Type>::remove(const Type& elem) {
 	root = del(root, elem);
 	return *this;
+}
+
+template <class Type>
+RBNode<Type>* RBTree<Type>::find(const Type& elem) const {
+	RBNode<Type>* ans = DepthSearch(root, elem);
+	return ans;
 }

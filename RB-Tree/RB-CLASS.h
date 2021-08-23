@@ -35,4 +35,5 @@ public:
 	}
 	RBTree& insert(const Type&);
 	RBTree& remove(const Type&);
+	RBNode<Type>* find(const Type&) const;
 };
